@@ -1,4 +1,4 @@
-
+css = """
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 /* ===== Reset & Base ===== */
@@ -558,3 +558,7 @@ footer a:hover { text-decoration: underline; }
   .stats-band { grid-template-columns: repeat(2, 1fr); }
   .stats-band .stat-item:last-child { grid-column: span 2; }
 }
+"""
+with open("style.css", "w") as f:
+    f.write(css)
+print("Updated style.css")

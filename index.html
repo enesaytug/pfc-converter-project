@@ -6,6 +6,10 @@
   <title>500 W Boost PFC Converter — ELK 453E Term Project</title>
   <meta name="description" content="Design, Component Sizing, Control and Model-Based Verification (MIL/SIL/PIL) of a 500 W, 400 V, 50 kHz Single-Phase Boost PFC Converter." />
   <link rel="stylesheet" href="style.css" />
+
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
 </head>
 <body>
 
@@ -99,13 +103,13 @@
       <div class="highlight-box">
         <h4>Design Specifications (Table 1)</h4>
         <div class="kv-grid">
-          <div class="kv-item"><span class="kv-label">V<sub>in</sub> (RMS)</span><span class="kv-value">240 V<sub>rms</sub></span></div>
-          <div class="kv-item"><span class="kv-label">f<sub>line</sub></span><span class="kv-value">50 Hz</span></div>
-          <div class="kv-item"><span class="kv-label">V<sub>o</sub></span><span class="kv-value">400 V</span></div>
-          <div class="kv-item"><span class="kv-label">P<sub>o</sub></span><span class="kv-value">500 W</span></div>
-          <div class="kv-item"><span class="kv-label">f<sub>s</sub></span><span class="kv-value">50 kHz</span></div>
-          <div class="kv-item"><span class="kv-label">ΔV<sub>o</sub>/V<sub>o</sub></span><span class="kv-value">&lt; 1%</span></div>
-          <div class="kv-item"><span class="kv-label">V̂<sub>p</sub> (carrier)</span><span class="kv-value">3 V</span></div>
+          <div class="kv-item"><span class="kv-label">\(V_{\text{in (RMS)}}\)</span><span class="kv-value">\(240 \text{ V}_{\text{rms}}\)</span></div>
+          <div class="kv-item"><span class="kv-label">\(f_{\text{line}}\)</span><span class="kv-value">50 Hz</span></div>
+          <div class="kv-item"><span class="kv-label">\(V_o\)</span><span class="kv-value">400 V</span></div>
+          <div class="kv-item"><span class="kv-label">\(P_o\)</span><span class="kv-value">500 W</span></div>
+          <div class="kv-item"><span class="kv-label">\(f_s\)</span><span class="kv-value">50 kHz</span></div>
+          <div class="kv-item"><span class="kv-label">Δ\(V_o\)/\(V_o\)</span><span class="kv-value">&lt; 1%</span></div>
+          <div class="kv-item"><span class="kv-label">\(\hat{V}_p \text{ (carrier)}\)</span><span class="kv-value">3 V</span></div>
         </div>
       </div>
     </div>
@@ -122,16 +126,20 @@
     </div>
     <div class="content-grid wide-text">
       <ul class="point-list">
-        <li><strong>Power path:</strong> AC mains → EMI filter → full-wave diode-bridge rectifier producing v<sub>rect</sub>(t) = V<sub>in,pk</sub>·|sin(ωt)|.</li>
-        <li><strong>Boost stage:</strong> inductor L, MOSFET S, ultrafast diode D, bulk output capacitor C<sub>o</sub> feeding load R = V<sub>o</sub>²/P<sub>o</sub>.</li>
+        <li><strong>Power path:</strong> AC mains → EMI filter → full-wave diode-bridge rectifier producing \(v_{\text{rect}}(t) = V_{\text{in,pk}}|\sin(\omega t)|\).</li>
+        <li><strong>Boost stage:</strong> inductor L, MOSFET S, ultrafast diode D, bulk output capacitor \(C_o\) feeding load R = \(V_o\)²/\(P_o\).</li>
         <li><strong>Dual-loop cascaded average current-mode control:</strong> a fast inner current loop (G<sub>ci</sub>) nested inside a slow outer voltage loop (G<sub>cv</sub>).</li>
-        <li>A multiplier/divider builds the sinusoidal current reference: i<sub>ref</sub> = (v<sub>ea</sub> · v<sub>rect</sub>) / V<sub>rms</sub>².</li>
+        <li>A multiplier/divider builds the sinusoidal current reference: \(i_{\text{ref}} = \frac{v_{\text{ea}} \cdot v_{\text{rect}}}{V_{\text{rms}}^2}\).</li>
         <li>PWM modulator uses a <strong>3 V sawtooth carrier</strong> at 50 kHz. Control scheme follows <strong>TI Application Report SPRA902A</strong>.</li>
       </ul>
-      <div class="callout callout-info">
-        <strong>Note on topology figure</strong>
-        The converter block diagram (report Figure 1) has not been exported yet. To add it, export page 6 of the report PDF as an image and save it to <code>figures/topology-block.png</code>.
+      
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/Converter_Topology.png" alt="Converter Topology" loading="lazy" />
+          <div class="fig-caption">Converter block diagram and control structure</div>
+        </div>
       </div>
+
     </div>
   </div>
 </section>
@@ -146,20 +154,20 @@
     </div>
     <div class="content-grid">
       <ul class="point-list">
-        <li><strong>Operating point:</strong> V<sub>in,pk</sub> = √2 × 240 = <strong>339.41 V</strong>; I<sub>in</sub> = 500/240 = <strong>2.083 A<sub>rms</sub></strong>; I<sub>in,pk</sub> = <strong>2.946 A</strong>; I<sub>o</sub> = <strong>1.25 A</strong>; R = <strong>320 Ω</strong>.</li>
-        <li><strong>Duty cycle range:</strong> d = 1 − V<sub>in,pk</sub>·|sin|/V<sub>o</sub> → d<sub>min</sub> = 0.1515 at the line peak; clamped to d ≤ 0.95 near zero-crossings.</li>
-        <li><strong>Boost inductor:</strong> CCM ripple rule with k = 0.4 gives L ≥ 0.872 mH. Chosen <strong>L = 12 mH</strong> for low ripple (ΔiL,pk ≈ 0.0857 A, ~2.9% of I<sub>in,pk</sub>) and robust CCM.</li>
-        <li><strong>Output capacitor:</strong> 2nd-harmonic ripple equation with 1% limit requires C<sub>o</sub> ≥ 994.7 µF. Chosen <strong>C<sub>o</sub> = 1500 µF</strong> → ΔV<sub>o,pp</sub> = 2.65 V → <strong>0.66% &lt; 1%</strong>.</li>
-        <li><strong>Semiconductors:</strong> MOSFET 600 V / 10 A (I<sub>S,pk</sub> = 3.29 A); boost diode 600 V / 5 A; diode bridge 600 V / 6 A.</li>
+        <li><strong>Operating point:</strong> \(V_{\text{in,pk}}\) = √2 × 240 = <strong>339.41 V</strong>; \(I_{\text{in}} = \frac{500}{240} = \mathbf{2.083 \text{ A}_{\text{rms}}}\); \(I_{\text{in,pk}}\) = <strong>2.946 A</strong>; \(I_o = \mathbf{1.25 \text{ A}}\); \(R = \mathbf{320 \ \Omega}\).</li>
+        <li><strong>Duty cycle range:</strong> d = 1 − \(V_{\text{in,pk}}\)·|sin|/\(V_o\) → \(d_{\text{min}}\) = 0.1515 at the line peak; clamped to d ≤ 0.95 near zero-crossings.</li>
+        <li><strong>Boost inductor:</strong> CCM ripple rule with k = 0.4 gives L ≥ 0.872 mH. Chosen <strong>L = 12 mH</strong> for low ripple (\(\Delta i_{L,\text{pk}}\) ≈ 0.0857 A, ~2.9% of \(I_{\text{in,pk}}\)) and robust CCM.</li>
+        <li><strong>Output capacitor:</strong> 2nd-harmonic ripple equation with 1% limit requires \(C_o\) ≥ 994.7 µF. Chosen <strong>\(C_o\) = 1500 µF</strong> → \(\Delta V_{o,\text{pp}}\) = 2.65 V → <strong>0.66% &lt; 1%</strong>.</li>
+        <li><strong>Semiconductors:</strong> MOSFET 600 V / 10 A (\(I_{S,\text{pk}}\) = 3.29 A); boost diode 600 V / 5 A; diode bridge 600 V / 6 A.</li>
         <li>Every value traces back to a <strong>closed-form equation</strong> in the report — not a trial number.</li>
       </ul>
       <div class="highlight-box">
         <h4>Chosen Passive Values</h4>
         <div class="kv-grid">
           <div class="kv-item"><span class="kv-label">Inductor L</span><span class="kv-value">12 mH</span></div>
-          <div class="kv-item"><span class="kv-label">Capacitor C<sub>o</sub></span><span class="kv-value">1500 µF</span></div>
-          <div class="kv-item"><span class="kv-label">ΔV<sub>o,pp</sub></span><span class="kv-value">2.65 V (0.66%)</span></div>
-          <div class="kv-item"><span class="kv-label">ΔiL,pk</span><span class="kv-value">0.0857 A</span></div>
+          <div class="kv-item"><span class="kv-label">Capacitor \(C_o\)</span><span class="kv-value">1500 µF</span></div>
+          <div class="kv-item"><span class="kv-label">\(\Delta V_{o,\text{pp}}\)</span><span class="kv-value">2.65 V (0.66%)</span></div>
+          <div class="kv-item"><span class="kv-label">\(\Delta i_{L,\text{pk}}\)</span><span class="kv-value">0.0857 A</span></div>
           <div class="kv-item"><span class="kv-label">MOSFET</span><span class="kv-value">600 V / 10 A</span></div>
           <div class="kv-item"><span class="kv-label">Boost Diode</span><span class="kv-value">600 V / 5 A</span></div>
         </div>
@@ -181,16 +189,16 @@
         <li>Switched state equations written for <strong>MOSFET-on</strong> and <strong>MOSFET-off</strong> subintervals.</li>
         <li>A moving-average operator over one switching period <strong>removes switching-frequency ripple</strong>, leaving only the envelope.</li>
         <li>Result: a <strong>bilinear large-signal averaged state-space model</strong> (duty ratio multiplies the states).</li>
-        <li>Quasi steady-state argument recovers: ⟨v<sub>o</sub>⟩ = ⟨v<sub>rect</sub>⟩/(1−d) and ⟨iL⟩ = I<sub>in,pk</sub>·|sin(ωt)|.</li>
-        <li>Open-loop simulation confirms the power stage sits in the <strong>correct operating region</strong> (V<sub>o</sub> ≈ 400 V).</li>
+        <li>Quasi steady-state argument recovers: \(\langle v_o \rangle = \frac{\langle v_{\text{rect}} \rangle}{1-d}\) and ⟨iL⟩ = \(I_{\text{in,pk}}\)·|sin(ωt)|.</li>
+        <li>Open-loop simulation confirms the power stage sits in the <strong>correct operating region</strong> (\(V_o\) ≈ 400 V).</li>
       </ul>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/openloop-vout-il.png" alt="Open-loop DC-side Vout and IL" loading="lazy" />
+          <img src="figures/Average_Model_Vout_and_IL.png" alt="Open-loop DC-side Vout and IL" loading="lazy" />
           <div class="fig-caption">Open-loop average model — DC-side output voltage V<sub>out</sub> and inductor current I<sub>L</sub></div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/openloop-vin-iin.png" alt="Open-loop input voltage and current" loading="lazy" />
+          <img src="figures/Average_Model_Vin_Iin.png" alt="Open-loop input voltage and current" loading="lazy" />
           <div class="fig-caption">Open-loop average model — input side v<sub>in</sub> and i<sub>in</sub></div>
         </div>
       </div>
@@ -209,14 +217,14 @@
     <div class="content-grid">
       <ul class="point-list">
         <li><strong>Linearised</strong> around the rated operating point.</li>
-        <li><strong>Current plant G<sub>id</sub>(s)</strong> = V<sub>o</sub>(1 + sRC<sub>o</sub>) / (s²LC<sub>o</sub>R + sL + R) — duty → inductor current. LC resonance ≈ <strong>37.5 Hz</strong>. At target crossover 5 kHz: |G<sub>id</sub>| = 0.515 dB, phase ≈ −90°.</li>
-        <li><strong>Voltage plant G<sub>vi</sub>(s)</strong> = R/(1 + sRC<sub>o</sub>) — inductor current → output voltage. Output pole ≈ <strong>0.332 Hz</strong>. At target crossover 2.5 Hz: |G<sub>vi</sub>| = 32.48 dB, phase ≈ −82.45°.</li>
+        <li><strong>Current plant \(G_{id}(s)\)</strong> = \(V_o\)(1 + sR\(C_o\)) / (s²L\(C_o\)R + sL + R) — duty → inductor current. LC resonance ≈ <strong>37.5 Hz</strong>. At target crossover 5 kHz: |G<sub>id</sub>| = 0.515 dB, phase ≈ −90°.</li>
+        <li><strong>Voltage plant \(G_{vi}(s)\)</strong> = R/(1 + sR\(C_o\)) — inductor current → output voltage. Output pole ≈ <strong>0.332 Hz</strong>. At target crossover 2.5 Hz: |G<sub>vi</sub>| = 32.48 dB, phase ≈ −82.45°.</li>
         <li>Both plants confirm the need for separate bandwidth targets: the <strong>current loop must be fast</strong> (kHz range) while the <strong>voltage loop must be slow</strong> (sub-10 Hz) to avoid distorting the sinusoidal reference.</li>
       </ul>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/plant-bode.png" alt="Small-signal plant Bode plots (Gid, Gvi)" loading="lazy" />
-          <div class="fig-caption">Bode plots of the current plant G<sub>id</sub>(s) and voltage plant G<sub>vi</sub>(s)</div>
+          <img src="figures/Small_Signal_Bode.png" alt="Small-signal plant Bode plots (Gid, Gvi)" loading="lazy" />
+          <div class="fig-caption">Bode plots of the current plant \(G_{id}(s)\) and voltage plant \(G_{vi}(s)\)</div>
         </div>
       </div>
     </div>
@@ -237,33 +245,29 @@
           <li>Started from textbook PI gains aimed at the <strong>5 kHz / 2.5 Hz crossover targets</strong>.</li>
           <li>Those gains kept input-current THD <strong>stuck above the 5% limit</strong>, regardless of gain adjustments.</li>
           <li>Spent hours iterating PI gains and passive values together — no textbook gain set worked alone.</li>
-          <li><strong>Passive redesign was the key move:</strong> L changed from 1 mH → 12 mH; C<sub>o</sub> changed from 4500 µF → 1500 µF. This cut the ripple far more effectively than forcing the PI to hit crossover targets.</li>
+          <li><strong>Passive redesign was the key move:</strong> L changed from 1 mH → 12 mH; \(C_o\) changed from 4500 µF → 1500 µF. This cut the ripple far more effectively than forcing the PI to hit crossover targets.</li>
           <li>Final selection rule: <strong>"best measured THD and PF"</strong>, not exact crossover matching.</li>
         </ul>
 
         <div class="callout callout-success" style="margin-top:1.5rem">
           <strong>Final PI Gains (continuous)</strong>
-          Current PI: K<sub>p</sub> = 2.8, K<sub>i</sub> = 17 600 &nbsp;&mdash;&nbsp;
-          Voltage PI: K<sub>p</sub> = 0.055, K<sub>i</sub> = 0.2
+          Current PI: \(K_p\) = 2.8, \(K_i\) = 17 600 &nbsp;&mdash;&nbsp;
+          Voltage PI: \(K_p\) = 0.055, \(K_i\) = 0.2
         </div>
 
         <div class="callout callout-info" style="margin-top:0.75rem">
-          <strong>Discrete form (T<sub>s</sub> = 20 µs)</strong>
-          K<sub>i,i,d</sub> = 0.352, K<sub>i,v,d</sub> = 4.0 × 10⁻⁶ (K<sub>p</sub> unchanged in both loops)
+          <strong>Discrete form (\(T_s\) = 20 µs)</strong>
+          \(K_{i,i,d}\) = 0.352, \(K_{i,v,d}\) = 4.0 × 10⁻⁶ (\(K_p\) unchanged in both loops)
         </div>
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/closedloop-vout.png" alt="Closed-loop Vout response" loading="lazy" />
-          <div class="fig-caption">Closed-loop output voltage — V<sub>out</sub> settles near 400 V</div>
+          <img src="figures/After_PI_Controller.png" alt="After PI Controller" loading="lazy" />
+          <div class="fig-caption">After PI Controller Waveforms</div>
         </div>
-        <div class="fig-wrap">
-          <img src="figures/closedloop-vin-iin.png" alt="Closed-loop input current and voltage" loading="lazy" />
-          <div class="fig-caption">Closed-loop input current and voltage waveforms</div>
+        
         </div>
-        <div class="fig-wrap">
-          <img src="figures/inductor-current.png" alt="Zoomed inductor current waveform" loading="lazy" />
-          <div class="fig-caption">Zoomed inductor current — smooth sinusoidal envelope</div>
+        
         </div>
       </div>
     </div>
@@ -295,11 +299,11 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/openloop-margins.png" alt="Open-loop gain and phase margins" loading="lazy" />
+          <img src="figures/Part2_OpenLoop_Margins.png" alt="Open-loop gain and phase margins" loading="lazy" />
           <div class="fig-caption">Open-loop margins — current and voltage loop Bode plots</div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/closedloop-bode.png" alt="Closed-loop Bode response" loading="lazy" />
+          <img src="figures/Part2_ClosedLoop_Bode.png" alt="Closed-loop Bode response" loading="lazy" />
           <div class="fig-caption">Closed-loop Bode response</div>
         </div>
       </div>
@@ -331,7 +335,7 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/thd-pf-model.png" alt="Simulink THD 0.0448 and PF 0.9999 measurement" loading="lazy" />
+          <img src="figures/Simulink_Measurement_Block_.png" alt="Simulink THD 0.0448 and PF 0.9999 measurement" loading="lazy" />
           <div class="fig-caption">Simulink measurement block: PF = 0.9999, THD = 0.0448</div>
         </div>
       </div>
@@ -394,15 +398,15 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/mil-waveform.png" alt="MIL waveform set" loading="lazy" />
+          <img src="figures/MIL_WaveForms.png" alt="MIL waveform set" loading="lazy" />
           <div class="fig-caption">MIL — waveform set (Part g)</div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/mil-thd-view.png" alt="MIL THD measurement view" loading="lazy" />
+          <img src="figures/MIL_THD.png" alt="MIL THD measurement view" loading="lazy" />
           <div class="fig-caption">MIL — THD measurement view</div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/sil-waveform.png" alt="SIL waveform result" loading="lazy" />
+          <img src="figures/SIL.png" alt="SIL waveform result" loading="lazy" />
           <div class="fig-caption">SIL — waveform result (Part h)</div>
         </div>
       </div>
@@ -421,7 +425,7 @@
     <div class="content-grid single">
       <ul class="point-list">
         <li>Carried the design <strong>from spec-based component sizing all the way to model-based verification</strong> — a complete MIL/SIL chain.</li>
-        <li>The <strong>passive redesign</strong> (L: 1 mH → 12 mH, C<sub>o</sub>: 4500 µF → 1500 µF) was the key move that brought THD under 5% while keeping PF near 0.99.</li>
+        <li>The <strong>passive redesign</strong> (L: 1 mH → 12 mH, \(C_o\): 4500 µF → 1500 µF) was the key move that brought THD under 5% while keeping PF near 0.99.</li>
         <li><strong>Dual-loop average current-mode control</strong> gave stable, well-damped regulation with phase margins exceeding 86° in both loops.</li>
         <li>MIL and SIL confirmed the controller <strong>survives the move into generated C code</strong> with comparable performance.</li>
         <li><strong>Future work:</strong> close the PIL loop on real hardware; investigate and reduce THD window sensitivity (possibly by reducing current-loop bandwidth).</li>
