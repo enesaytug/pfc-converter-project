@@ -135,7 +135,7 @@
       
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/Converter_Topology.png" alt="Converter Topology" loading="lazy" />
+          <embed src="Converter Topology.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Converter block diagram and control structure</div>
         </div>
       </div>
@@ -194,11 +194,11 @@
       </ul>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/Average_Model_Vout_and_IL.png" alt="Open-loop DC-side Vout and IL" loading="lazy" />
+          <embed src="Average Model Vout and IL.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Open-loop average model — DC-side output voltage V<sub>out</sub> and inductor current I<sub>L</sub></div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/Average_Model_Vin_Iin.png" alt="Open-loop input voltage and current" loading="lazy" />
+          <embed src="Average Model Vin Iin.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Open-loop average model — input side v<sub>in</sub> and i<sub>in</sub></div>
         </div>
       </div>
@@ -223,7 +223,7 @@
       </ul>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/Small_Signal_Bode.png" alt="Small-signal plant Bode plots (Gid, Gvi)" loading="lazy" />
+          <embed src="Small Signal Bode.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Bode plots of the current plant \(G_{id}(s)\) and voltage plant \(G_{vi}(s)\)</div>
         </div>
       </div>
@@ -244,7 +244,7 @@
         <ul class="point-list">
           <li>Started from textbook PI gains aimed at the <strong>5 kHz / 2.5 Hz crossover targets</strong>.</li>
           <li>Those gains kept input-current THD <strong>stuck above the 5% limit</strong>, regardless of gain adjustments.</li>
-          <li>Spent hours iterating PI gains and passive values together — no textbook gain set worked alone.</li>
+          <li>Several PI gain sets were evaluated through simulation. The final gains were selected based on the best combined THD, PF, and output-voltage regulation performance.</li>
           <li><strong>Passive redesign was the key move:</strong> L changed from 1 mH → 12 mH; \(C_o\) changed from 4500 µF → 1500 µF. This cut the ripple far more effectively than forcing the PI to hit crossover targets.</li>
           <li>Final selection rule: <strong>"best measured THD and PF"</strong>, not exact crossover matching.</li>
         </ul>
@@ -262,7 +262,7 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/After_PI_Controller.png" alt="After PI Controller" loading="lazy" />
+          <embed src="After PI Controller.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">After PI Controller Waveforms</div>
         </div>
         
@@ -287,7 +287,7 @@
         <ul class="point-list">
           <li><strong>Current loop</strong> actual crossover: <strong>14.89 kHz</strong> (≈ 3× the 5 kHz target). PM ≈ <strong>86.2°</strong>.</li>
           <li><strong>Voltage loop</strong> actual crossover: <strong>5.85 Hz</strong> (≈ 2.3× the 2.5 Hz target). PM ≈ <strong>87.6°</strong>.</li>
-          <li><strong>Gain margin: infinite</strong> (no finite phase crossing) for both loops → unconditionally stable.</li>
+          <li>Both loops show very large linear stability margins at the selected operating point. However, practical robustness is still limited by duty saturation, sampling effects, and THD measurement-window sensitivity.</li>
           <li>Higher-than-target bandwidth accepted as a <strong>deliberate practical compromise</strong> for better harmonic performance.</li>
           <li>Both loops show very well-damped transient response consistent with phase margins &gt; 86°.</li>
         </ul>
@@ -299,11 +299,11 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/Part2_OpenLoop_Margins.png" alt="Open-loop gain and phase margins" loading="lazy" />
+          <embed src="Part2_OpenLoop_Margins.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Open-loop margins — current and voltage loop Bode plots</div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/Part2_ClosedLoop_Bode.png" alt="Closed-loop Bode response" loading="lazy" />
+          <embed src="Part2_ClosedLoop_Bode.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Closed-loop Bode response</div>
         </div>
       </div>
@@ -335,7 +335,7 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/Simulink_Measurement_Block_.png" alt="Simulink THD 0.0448 and PF 0.9999 measurement" loading="lazy" />
+          <embed src="Simulink Measurement Block .pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">Simulink measurement block: PF = 0.9999, THD = 0.0448</div>
         </div>
       </div>
@@ -398,15 +398,15 @@
       </div>
       <div class="fig-block">
         <div class="fig-wrap">
-          <img src="figures/MIL_WaveForms.png" alt="MIL waveform set" loading="lazy" />
+          <embed src="MIL WaveForms.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">MIL — waveform set (Part g)</div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/MIL_THD.png" alt="MIL THD measurement view" loading="lazy" />
+          <embed src="MIL THD.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">MIL — THD measurement view</div>
         </div>
         <div class="fig-wrap">
-          <img src="figures/SIL.png" alt="SIL waveform result" loading="lazy" />
+          <embed src="SIL.pdf" type="application/pdf" width="100%" height="400px" style="border-radius: var(--radius);" />
           <div class="fig-caption">SIL — waveform result (Part h)</div>
         </div>
       </div>
