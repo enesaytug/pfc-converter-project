@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>500 W Boost PFC Converter — ELK 453E Term Project</title>
+  <meta name="description" content="Design, Component Sizing, Control and Model-Based Verification (MIL/SIL/PIL) of a 500 W, 400 V, 50 kHz Single-Phase Boost PFC Converter." />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- ===== NAV ===== -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-brand" href="#hero">PFC Converter</a>
+    <ul class="nav-links">
+      <li><a href="#what-is-pfc">PFC</a></li>
+      <li><a href="#topology">Topology</a></li>
+      <li><a href="#sizing">Sizing</a></li>
+      <li><a href="#avg-model">Avg Model</a></li>
+      <li><a href="#bode">Bode</a></li>
+      <li><a href="#pi-design">PI Design</a></li>
+      <li><a href="#stability">Stability</a></li>
+      <li><a href="#performance">Performance</a></li>
+      <li><a href="#limitations">Limitations</a></li>
+      <li><a href="#mil-sil-pil">MIL/SIL/PIL</a></li>
+      <li><a href="#conclusion">Conclusion</a></li>
+      <li><a href="#references">References</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ===== HERO ===== -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-badge">ELK 453E — Industrial Applications of Power Electronics &nbsp;·&nbsp; İTÜ</div>
+    <h1 class="hero-title">500 W, 400 V, 50 kHz<br>Single-Phase Boost PFC Converter</h1>
+    <p class="hero-subtitle">Design, Component Sizing, Control and Model-Based Verification (MIL / SIL / PIL)</p>
+
+    <div class="hero-meta">
+      <span><strong>Authors:</strong> Enes Aytuğ Kır (040240785) &amp; Ufuk Barın (040240791)</span>
+      <span><strong>Coordinator:</strong> Prof. Dr. S. Barış Öztürk</span>
+      <span><strong>Institution:</strong> Istanbul Technical University (İTÜ)</span>
+    </div>
+
+    <!-- Key Results -->
+    <div class="stats-band">
+      <div class="stat-item">
+        <div class="stat-value">0.99</div>
+        <div class="stat-label">Power Factor</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">4.48%</div>
+        <div class="stat-label">Current THD</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">400 V</div>
+        <div class="stat-label">V<sub>out</sub></div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">500 W</div>
+        <div class="stat-label">Rated Power</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">50 kHz</div>
+        <div class="stat-label">f<sub>sw</sub></div>
+      </div>
+    </div>
+
+    <div class="hero-actions">
+      <a href="#what-is-pfc" class="btn-primary">
+        <span>&#9660;</span> Explore the Project
+      </a>
+      <a href="report.pdf" class="btn-secondary" download>
+        &#8681; Download Full Report (PDF)
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 1 — What is PFC ===== -->
+<section class="section" id="what-is-pfc">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Background</span>
+      <h2 class="section-title">What is PFC and Why Do We Need It?</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid wide-text">
+      <ul class="point-list">
+        <li>A standard diode bridge with a bulk capacitor draws current only near the voltage peaks — the line current is <strong>spiky and non-sinusoidal</strong>.</li>
+        <li>This lowers the power factor and injects significant current harmonics into the grid, wasting distribution capacity.</li>
+        <li>A <strong>boost PFC stage</strong> forces the input current to be sinusoidal and in phase with the voltage, driving the power factor toward unity.</li>
+        <li>Key benefits: compliance with harmonic standards (e.g. <strong>IEC 61000-3-2</strong>), lower RMS current, and better utilisation of the supply.</li>
+        <li>Real-world applications: <strong>server &amp; PC power supplies, LED drivers, EV chargers, appliance motor drives</strong>.</li>
+      </ul>
+      <div class="highlight-box">
+        <h4>Design Specifications (Table 1)</h4>
+        <div class="kv-grid">
+          <div class="kv-item"><span class="kv-label">V<sub>in</sub> (RMS)</span><span class="kv-value">240 V<sub>rms</sub></span></div>
+          <div class="kv-item"><span class="kv-label">f<sub>line</sub></span><span class="kv-value">50 Hz</span></div>
+          <div class="kv-item"><span class="kv-label">V<sub>o</sub></span><span class="kv-value">400 V</span></div>
+          <div class="kv-item"><span class="kv-label">P<sub>o</sub></span><span class="kv-value">500 W</span></div>
+          <div class="kv-item"><span class="kv-label">f<sub>s</sub></span><span class="kv-value">50 kHz</span></div>
+          <div class="kv-item"><span class="kv-label">ΔV<sub>o</sub>/V<sub>o</sub></span><span class="kv-value">&lt; 1%</span></div>
+          <div class="kv-item"><span class="kv-label">V̂<sub>p</sub> (carrier)</span><span class="kv-value">3 V</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 2 — Topology & Control ===== -->
+<section class="section" id="topology">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Architecture</span>
+      <h2 class="section-title">Converter Topology &amp; Control Structure</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid wide-text">
+      <ul class="point-list">
+        <li><strong>Power path:</strong> AC mains → EMI filter → full-wave diode-bridge rectifier producing v<sub>rect</sub>(t) = V<sub>in,pk</sub>·|sin(ωt)|.</li>
+        <li><strong>Boost stage:</strong> inductor L, MOSFET S, ultrafast diode D, bulk output capacitor C<sub>o</sub> feeding load R = V<sub>o</sub>²/P<sub>o</sub>.</li>
+        <li><strong>Dual-loop cascaded average current-mode control:</strong> a fast inner current loop (G<sub>ci</sub>) nested inside a slow outer voltage loop (G<sub>cv</sub>).</li>
+        <li>A multiplier/divider builds the sinusoidal current reference: i<sub>ref</sub> = (v<sub>ea</sub> · v<sub>rect</sub>) / V<sub>rms</sub>².</li>
+        <li>PWM modulator uses a <strong>3 V sawtooth carrier</strong> at 50 kHz. Control scheme follows <strong>TI Application Report SPRA902A</strong>.</li>
+      </ul>
+      <div class="callout callout-info">
+        <strong>Note on topology figure</strong>
+        The converter block diagram (report Figure 1) has not been exported yet. To add it, export page 6 of the report PDF as an image and save it to <code>figures/topology-block.png</code>.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 3 — Component Sizing ===== -->
+<section class="section" id="sizing">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Design Maths</span>
+      <h2 class="section-title">Mathematical Component Sizing</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid">
+      <ul class="point-list">
+        <li><strong>Operating point:</strong> V<sub>in,pk</sub> = √2 × 240 = <strong>339.41 V</strong>; I<sub>in</sub> = 500/240 = <strong>2.083 A<sub>rms</sub></strong>; I<sub>in,pk</sub> = <strong>2.946 A</strong>; I<sub>o</sub> = <strong>1.25 A</strong>; R = <strong>320 Ω</strong>.</li>
+        <li><strong>Duty cycle range:</strong> d = 1 − V<sub>in,pk</sub>·|sin|/V<sub>o</sub> → d<sub>min</sub> = 0.1515 at the line peak; clamped to d ≤ 0.95 near zero-crossings.</li>
+        <li><strong>Boost inductor:</strong> CCM ripple rule with k = 0.4 gives L ≥ 0.872 mH. Chosen <strong>L = 12 mH</strong> for low ripple (ΔiL,pk ≈ 0.0857 A, ~2.9% of I<sub>in,pk</sub>) and robust CCM.</li>
+        <li><strong>Output capacitor:</strong> 2nd-harmonic ripple equation with 1% limit requires C<sub>o</sub> ≥ 994.7 µF. Chosen <strong>C<sub>o</sub> = 1500 µF</strong> → ΔV<sub>o,pp</sub> = 2.65 V → <strong>0.66% &lt; 1%</strong>.</li>
+        <li><strong>Semiconductors:</strong> MOSFET 600 V / 10 A (I<sub>S,pk</sub> = 3.29 A); boost diode 600 V / 5 A; diode bridge 600 V / 6 A.</li>
+        <li>Every value traces back to a <strong>closed-form equation</strong> in the report — not a trial number.</li>
+      </ul>
+      <div class="highlight-box">
+        <h4>Chosen Passive Values</h4>
+        <div class="kv-grid">
+          <div class="kv-item"><span class="kv-label">Inductor L</span><span class="kv-value">12 mH</span></div>
+          <div class="kv-item"><span class="kv-label">Capacitor C<sub>o</sub></span><span class="kv-value">1500 µF</span></div>
+          <div class="kv-item"><span class="kv-label">ΔV<sub>o,pp</sub></span><span class="kv-value">2.65 V (0.66%)</span></div>
+          <div class="kv-item"><span class="kv-label">ΔiL,pk</span><span class="kv-value">0.0857 A</span></div>
+          <div class="kv-item"><span class="kv-label">MOSFET</span><span class="kv-value">600 V / 10 A</span></div>
+          <div class="kv-item"><span class="kv-label">Boost Diode</span><span class="kv-value">600 V / 5 A</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 4 — Average Model ===== -->
+<section class="section" id="avg-model">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Modelling</span>
+      <h2 class="section-title">Average Model of the Converter</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid wide-text">
+      <ul class="point-list">
+        <li>Switched state equations written for <strong>MOSFET-on</strong> and <strong>MOSFET-off</strong> subintervals.</li>
+        <li>A moving-average operator over one switching period <strong>removes switching-frequency ripple</strong>, leaving only the envelope.</li>
+        <li>Result: a <strong>bilinear large-signal averaged state-space model</strong> (duty ratio multiplies the states).</li>
+        <li>Quasi steady-state argument recovers: ⟨v<sub>o</sub>⟩ = ⟨v<sub>rect</sub>⟩/(1−d) and ⟨iL⟩ = I<sub>in,pk</sub>·|sin(ωt)|.</li>
+        <li>Open-loop simulation confirms the power stage sits in the <strong>correct operating region</strong> (V<sub>o</sub> ≈ 400 V).</li>
+      </ul>
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/openloop-vout-il.png" alt="Open-loop DC-side Vout and IL" loading="lazy" />
+          <div class="fig-caption">Open-loop average model — DC-side output voltage V<sub>out</sub> and inductor current I<sub>L</sub></div>
+        </div>
+        <div class="fig-wrap">
+          <img src="figures/openloop-vin-iin.png" alt="Open-loop input voltage and current" loading="lazy" />
+          <div class="fig-caption">Open-loop average model — input side v<sub>in</sub> and i<sub>in</sub></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 5 — Bode Analysis ===== -->
+<section class="section" id="bode">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Small-Signal Analysis</span>
+      <h2 class="section-title">Small-Signal Plants &amp; Bode Analysis</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid">
+      <ul class="point-list">
+        <li><strong>Linearised</strong> around the rated operating point.</li>
+        <li><strong>Current plant G<sub>id</sub>(s)</strong> = V<sub>o</sub>(1 + sRC<sub>o</sub>) / (s²LC<sub>o</sub>R + sL + R) — duty → inductor current. LC resonance ≈ <strong>37.5 Hz</strong>. At target crossover 5 kHz: |G<sub>id</sub>| = 0.515 dB, phase ≈ −90°.</li>
+        <li><strong>Voltage plant G<sub>vi</sub>(s)</strong> = R/(1 + sRC<sub>o</sub>) — inductor current → output voltage. Output pole ≈ <strong>0.332 Hz</strong>. At target crossover 2.5 Hz: |G<sub>vi</sub>| = 32.48 dB, phase ≈ −82.45°.</li>
+        <li>Both plants confirm the need for separate bandwidth targets: the <strong>current loop must be fast</strong> (kHz range) while the <strong>voltage loop must be slow</strong> (sub-10 Hz) to avoid distorting the sinusoidal reference.</li>
+      </ul>
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/plant-bode.png" alt="Small-signal plant Bode plots (Gid, Gvi)" loading="lazy" />
+          <div class="fig-caption">Bode plots of the current plant G<sub>id</sub>(s) and voltage plant G<sub>vi</sub>(s)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 6 — PI Design & Re-tuning ===== -->
+<section class="section" id="pi-design">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Controller Design</span>
+      <h2 class="section-title">PI Controller Design &amp; Re-Tuning</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid wide-text">
+      <div>
+        <ul class="point-list">
+          <li>Started from textbook PI gains aimed at the <strong>5 kHz / 2.5 Hz crossover targets</strong>.</li>
+          <li>Those gains kept input-current THD <strong>stuck above the 5% limit</strong>, regardless of gain adjustments.</li>
+          <li>Spent hours iterating PI gains and passive values together — no textbook gain set worked alone.</li>
+          <li><strong>Passive redesign was the key move:</strong> L changed from 1 mH → 12 mH; C<sub>o</sub> changed from 4500 µF → 1500 µF. This cut the ripple far more effectively than forcing the PI to hit crossover targets.</li>
+          <li>Final selection rule: <strong>"best measured THD and PF"</strong>, not exact crossover matching.</li>
+        </ul>
+
+        <div class="callout callout-success" style="margin-top:1.5rem">
+          <strong>Final PI Gains (continuous)</strong>
+          Current PI: K<sub>p</sub> = 2.8, K<sub>i</sub> = 17 600 &nbsp;&mdash;&nbsp;
+          Voltage PI: K<sub>p</sub> = 0.055, K<sub>i</sub> = 0.2
+        </div>
+
+        <div class="callout callout-info" style="margin-top:0.75rem">
+          <strong>Discrete form (T<sub>s</sub> = 20 µs)</strong>
+          K<sub>i,i,d</sub> = 0.352, K<sub>i,v,d</sub> = 4.0 × 10⁻⁶ (K<sub>p</sub> unchanged in both loops)
+        </div>
+      </div>
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/closedloop-vout.png" alt="Closed-loop Vout response" loading="lazy" />
+          <div class="fig-caption">Closed-loop output voltage — V<sub>out</sub> settles near 400 V</div>
+        </div>
+        <div class="fig-wrap">
+          <img src="figures/closedloop-vin-iin.png" alt="Closed-loop input current and voltage" loading="lazy" />
+          <div class="fig-caption">Closed-loop input current and voltage waveforms</div>
+        </div>
+        <div class="fig-wrap">
+          <img src="figures/inductor-current.png" alt="Zoomed inductor current waveform" loading="lazy" />
+          <div class="fig-caption">Zoomed inductor current — smooth sinusoidal envelope</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 7 — Stability Margins ===== -->
+<section class="section" id="stability">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Stability</span>
+      <h2 class="section-title">Loop-Gain Stability Margins</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid">
+      <div>
+        <ul class="point-list">
+          <li><strong>Current loop</strong> actual crossover: <strong>14.89 kHz</strong> (≈ 3× the 5 kHz target). PM ≈ <strong>86.2°</strong>.</li>
+          <li><strong>Voltage loop</strong> actual crossover: <strong>5.85 Hz</strong> (≈ 2.3× the 2.5 Hz target). PM ≈ <strong>87.6°</strong>.</li>
+          <li><strong>Gain margin: infinite</strong> (no finite phase crossing) for both loops → unconditionally stable.</li>
+          <li>Higher-than-target bandwidth accepted as a <strong>deliberate practical compromise</strong> for better harmonic performance.</li>
+          <li>Both loops show very well-damped transient response consistent with phase margins &gt; 86°.</li>
+        </ul>
+        <div class="results-pills">
+          <span class="pill">Current loop PM <strong>86.2°</strong></span>
+          <span class="pill">Voltage loop PM <strong>87.6°</strong></span>
+          <span class="pill">Gain margin <strong>∞ (both loops)</strong></span>
+        </div>
+      </div>
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/openloop-margins.png" alt="Open-loop gain and phase margins" loading="lazy" />
+          <div class="fig-caption">Open-loop margins — current and voltage loop Bode plots</div>
+        </div>
+        <div class="fig-wrap">
+          <img src="figures/closedloop-bode.png" alt="Closed-loop Bode response" loading="lazy" />
+          <div class="fig-caption">Closed-loop Bode response</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 8 — Performance ===== -->
+<section class="section" id="performance">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Results</span>
+      <h2 class="section-title">Performance — THD &amp; Power Factor</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid wide-text">
+      <div>
+        <ul class="point-list">
+          <li>Output voltage regulated, settling near <strong>400 V</strong> after the startup transient.</li>
+          <li>Input current shaped to follow the line-voltage envelope — <strong>sinusoidal and in phase</strong>.</li>
+          <li>Measured <strong>Power Factor ≈ 0.99</strong> (Simulink value: 0.9999).</li>
+          <li>Representative input-current <strong>THD ≈ 4.48%</strong> — below the 5% design target.</li>
+          <li>Dual-loop control stable with very large phase margins (&gt; 86°).</li>
+        </ul>
+        <div class="callout callout-success" style="margin-top:1.5rem">
+          <strong>Key results (Simulink measurement)</strong>
+          Power Factor = 0.9999 &nbsp;&mdash;&nbsp; THD = 0.0448 (4.48%)
+        </div>
+      </div>
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/thd-pf-model.png" alt="Simulink THD 0.0448 and PF 0.9999 measurement" loading="lazy" />
+          <div class="fig-caption">Simulink measurement block: PF = 0.9999, THD = 0.0448</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 9 — Limitations ===== -->
+<section class="section" id="limitations">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Honest Assessment</span>
+      <h2 class="section-title">Limitations — Where the System Falls Short</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid single">
+      <ul class="point-list">
+        <li>The good THD holds in the <strong>chosen steady-state window</strong> but can spike up to <strong>~12% in other analysis windows</strong> — the system is sensitive to the measurement interval.</li>
+        <li>High current-loop bandwidth (14.89 kHz) is the <strong>likely cause of window sensitivity</strong> — the fast loop amplifies switching-edge noise depending on where the window lands.</li>
+        <li>The voltage loop is also faster than its target, though still slow enough not to distort the sinusoidal current reference.</li>
+        <li><strong>PIL hardware verification was never closed</strong> — no physical TI C2000 (LAUNCHXL-F28379D) board was available. On-target numerics and timing compliance within the 20 µs sample period remain unverified.</li>
+        <li><strong>Summary:</strong> Regulation and PF are solid. Harmonic robustness across windows is the weak point. Real-hardware validation (PIL) is future work.</li>
+      </ul>
+      <div class="callout callout-warn" style="margin-top:1.5rem">
+        <strong>Window-sensitivity note</strong>
+        THD can read as high as ~12% depending on the Simulink measurement window position. The reported 4.48% is from the cleanest steady-state window. Future work should widen the analysis to confirm IEC 61000-3-2 compliance across the full line cycle.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 10 — MIL / SIL / PIL ===== -->
+<section class="section" id="mil-sil-pil">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Verification Chain</span>
+      <h2 class="section-title">MIL / SIL / PIL Verification</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid wide-text">
+      <div>
+        <div class="badge-row">
+          <div class="badge badge-mil">
+            <strong>MIL — Model-in-the-Loop</strong>
+            Controller runs as a Simulink model inside the closed-loop simulation (Part f/g). THD ≈ 4.92%, PF ≈ 0.99. ✓ Completed.
+          </div>
+          <div class="badge badge-sil">
+            <strong>SIL — Software-in-the-Loop</strong>
+            Controller compiled to C code and run on the host computer (Part h). Built on macOS with Xcode Clang (x64). Stronger startup transient observed. ✓ Completed.
+          </div>
+          <div class="badge badge-pil">
+            <strong>PIL — Processor-in-the-Loop</strong>
+            Same C code cross-compiled and run on TI C2000 LAUNCHXL-F28379D Delfino. Verifies target numerics, bit-accurate behaviour, and 20 µs timing budget. ⚠ Documented conceptually — hardware not available.
+          </div>
+        </div>
+        <ul class="point-list" style="margin-top:1.5rem">
+          <li><strong>MIL vs SIL comparison:</strong> Part f (reference sim) THD ≈ 4.48% / PF ≈ 0.99; Part g (MIL) THD ≈ 4.92%; Part h (SIL) execution verified with stronger startup transient.</li>
+          <li>Moving the SIL build to Windows may raise toolchain/path errors; original build used macOS x64 Clang.</li>
+        </ul>
+      </div>
+      <div class="fig-block">
+        <div class="fig-wrap">
+          <img src="figures/mil-waveform.png" alt="MIL waveform set" loading="lazy" />
+          <div class="fig-caption">MIL — waveform set (Part g)</div>
+        </div>
+        <div class="fig-wrap">
+          <img src="figures/mil-thd-view.png" alt="MIL THD measurement view" loading="lazy" />
+          <div class="fig-caption">MIL — THD measurement view</div>
+        </div>
+        <div class="fig-wrap">
+          <img src="figures/sil-waveform.png" alt="SIL waveform result" loading="lazy" />
+          <div class="fig-caption">SIL — waveform result (Part h)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 11 — Conclusion ===== -->
+<section class="section" id="conclusion">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Summary</span>
+      <h2 class="section-title">Conclusion</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="content-grid single">
+      <ul class="point-list">
+        <li>Carried the design <strong>from spec-based component sizing all the way to model-based verification</strong> — a complete MIL/SIL chain.</li>
+        <li>The <strong>passive redesign</strong> (L: 1 mH → 12 mH, C<sub>o</sub>: 4500 µF → 1500 µF) was the key move that brought THD under 5% while keeping PF near 0.99.</li>
+        <li><strong>Dual-loop average current-mode control</strong> gave stable, well-damped regulation with phase margins exceeding 86° in both loops.</li>
+        <li>MIL and SIL confirmed the controller <strong>survives the move into generated C code</strong> with comparable performance.</li>
+        <li><strong>Future work:</strong> close the PIL loop on real hardware; investigate and reduce THD window sensitivity (possibly by reducing current-loop bandwidth).</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ===== SECTION 12 — References ===== -->
+<section class="section" id="references">
+  <div class="section-inner">
+    <div class="section-header">
+      <span class="section-tag">Bibliography</span>
+      <h2 class="section-title">References</h2>
+      <div class="divider"></div>
+    </div>
+    <ol class="ref-list">
+      <li>R. W. Erickson and D. Maksimović, <em>Fundamentals of Power Electronics</em>, 3rd ed., Springer, 2020.</li>
+      <li>D. W. Hart, <em>Power Electronics</em>, McGraw-Hill, 2011.</li>
+      <li>N. Mohan, T. M. Undeland, W. P. Robbins, <em>Power Electronics: Converters, Applications, and Design</em>, 3rd ed., Wiley, 2003.</li>
+      <li>S. Choudhury, "Average Current Mode Controlled PFC Converter using TMS320LF2407A," TI Application Report SPRA902A, Jul. 2005.</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ===== FOOTER ===== -->
+<footer>
+  <p>
+    500 W Boost PFC Converter &mdash; ELK 453E Term Project &mdash; Istanbul Technical University (İTÜ)
+    <br>
+    Enes Aytuğ Kır &amp; Ufuk Barın &mdash; <a href="report.pdf" download>Download Full Report</a>
+  </p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
